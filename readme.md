@@ -398,7 +398,7 @@ Após feita a instalação do **cors**
     app.use(cors()); //Permite o uso do cors
 
 Parâmetros podemos passar os domínios que quisermos
-Peixando assim todos os dominios podem ser acessado publicamente. 
+deixando assim todos os dominios podem ser acessado publicamente. 
   
   
   
