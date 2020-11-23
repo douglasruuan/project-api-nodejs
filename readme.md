@@ -383,8 +383,8 @@ E após no ProductController iremos alterar na parte do Index determinando o nú
     limit:  10  //Limite de dados que vamos retornar por pagina    
     });
 
-    ## Adicionando CORS
-
+   
+ ## Adicionando CORS
 Permitindo outros endereços tenham acesso a nossa **API.**
 Por enquanto a gente só está conseguindo acessar nossa **API** pelo Navegador acessando pelo próprio endereço dela, ou pelo Insominia.
 Quando tivermos nossa aplicação em outro domínio, e eu queira acessar nossa aplicação que está em outro endereço, ele não vai permitir.
