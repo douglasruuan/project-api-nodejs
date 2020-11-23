@@ -245,31 +245,160 @@ Ela vai salvar a data e preenchida sozinha com o valor da data-atual do banco de
     },    
     });    
     mongoose.model('Product', ProductSchema);
-    
+
 Isso aqui para registrar um modelo na nossa aplicação. 
+
+## Separando os Arquivos de Dentro do Projeto.
+
+Dentro da pasta **SRC,** criar um arquivo chamado **routes.js** para separar as rotas,
+
+Após retirar a rota do **server.js** e colocar dentro do **routes.js** iremos exportar a variável **routes**, criada para importar dentro do **server.js.**
+
+Após separar a rota para **routes** iremos separar a lógica da **routes** para outro arquivo.
+
+Dentro da pasta **SRC** iremos criar outra pasta chamada **controller** e dentro desta pasta iremos criar outro arquivo chamado **ProductController.js**.
+
+ProductController será o arquivo que lidar com as operações que a gente vai ter dentro dos **models.**
+
+**Routes** ficará assim:
+
+    const  express  =  require("express"); //Importando O Express.    
+    const  routes  =  express.Router(); //Variavel para as rotas do express.    
+    const  ProductController  =  require('./controllers/ProductController'); 
+       
+    //Importando nosso ProductController e chamamos o método index.    
+    
+    routes.get("/products", ProductController.index);    
+    _module_._exports_  =  routes;
+
+Exportando o Routes para usarmos dentro do Server.JS 
+
+E o **ProductController**:
+
+    const  mongoose  =  require("mongoose"); // Importando o mongoose  
+      
+    //Para lidarmos com a parte de Banco de Dados.    
+    const  Product  =  mongoose.model('Product');
+    
+    //Importa nosso model de product    
+    //Exportando alguns objetos com algumas funções.
+    
+    _module_._exports_  = {    
+    async  index(_req_, _res_) {    
+    const  products  =  await  Product.find();    
+    return  _res_.json(products);    
+    },    
+    };
+
+## Instalando e Usando Insominia.rest
+
+Quando estamos listando dados, podemos acessar nossa API diretamente pelo navegador, pelo lado do cliente. Mas, se precisarmos testar a criação de um novo registro por meio do método POST ou a exclusão de um dado por meio do método DELETE, podemos notar algumas dificuldades. Como podemos fazer esses testes?
+Você já criou uma tag HTML de formulário para testar o envio de dados para um servidor? Isso pode ser bem cansativo e não muito produtivo, não é mesmo? Para resolver essas questões, temos à nossa disposição ferramentas que nos ajudam nos testes de APIs REST. Uma dessas ferramenta é o Insomnia.
+
+Após a instalação do Insomnia Clicar no (+) e por NewRequest botar o nome que você for fazer o `“get,post ...”` eu usei Index após la em cima passar a URL podendo também criar uma base_url em **Environment** ficando assim:
+
+    { "base_url": [http://localhost:3001/api](http://localhost:3001/api)"}
+
+Voltando na página principal apenas digitar `base_url/products.`
+
+## ProductController.JS – Routes.JS
+
+Modificando o **ProductController** e o **Routes**:
+Routes com Delete,Update e post...
+
+    const  express  =  require("express"); //Importando O Express.    
+    const  routes  =  express.Router(); //Variavel para as rotas do express.   
+     
+    const  ProductController  =  require('./controllers/ProductController');    
+    //Importando nosso ProductController e chamamos o método index.
+    
+    routes.get("/products", ProductController.index); //Criando um get.    
+    routes.get("/products/:id", ProductController.show); //Get por ID    
+    routes.post("/products", ProductController.store) //Criando um Post    
+    routes.put("/products/:id", ProductController.update); //Update/Atualização POR ID.    
+    routes.delete("/products/:id", ProductController.destroy); //DELETE POR ID.  
+      
+    _module_._exports_  =  routes;    
+    //Exportando o Routes para usarmos dentro do Server.JS
+
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
+**ProductController** para efetivar as alterações do Routes.
+
+    const  mongoose  =  require("mongoose"); // Importando o mongoose
+    
+    //Para lidarmos com a parte de Banco de Dados.    
+    const  Product  =  mongoose.model('Product');    
+    //Importa nosso model de product
+    
+    //Exportando alguns objetos com algumas funções.    
+    _module_._exports_  = {    
+    async  index(_req_, _res_) {    
+    const  products  =  await  Product.find();    
+    return  _res_.json(products);    
+    },    
+    async  show(_req_, _res_) {    
+    const  product  =  await  Product.findById(_req_.params.id);    
+    return  _res_.json(product);    
+    },    
+    async  store(_req_, _res_) {    
+    const  product  =  await  Product.create(_req_.body); //fazendo a requisão do corpo (body)    
+    return  _res_.json(product); //Retornando em formato de json o product.    
+    },    
+    async  update(_req_, _res_) {    
+    const  product  =  await  Product.findByIdAndUpdate(_req_.params.id, _req_.body, {    
+    new:  true    
+    });    
+    return  _res_.json(product);    
+    },    
+    async  destroy(_req_, _res_) {    
+    await  Product.findByIdAndRemove(_req_.params.id);    
+    return  _res_.send();    
+    }    
+    };
+
+## Utilizando um Paginate para Controller das Paginas.
+
+Nos temos o Index que retorna todos os nossos resultados, no insominia aparece todas as paginas de Produtos, com o paginate podemos limitar para o usuário ver e melhor perfeição para nos modificarmos.
+
+    npm install mongoose-paginate
+
+Após a instalação dentro do Product.js fazemos a importação dele, e depois que importar iremos ate o final da pagina e fazemos o:
+
+    ProductSchema.plugin(mongoosePaginate);
+
+E após no ProductController iremos alterar na parte do Index determinando o número de paginas passando parâmetros.
+
+
+    module.exports  = {
+    async  index(req, res) {    
+    const {    
+    //criando uma destruturação para requisição query são para parametros GET.    
+    //Inicializando na página 1.
+    
+    page  =  1    
+    } =  req.query;    
+    const  products  =  await  Product.paginate({/*Objeto Vazio se quisermos passar algum WHERE*/}, {    
+    page, //Pagina Atual    
+    limit:  10  //Limite de dados que vamos retornar por pagina    
+    });
+
+    ## Adicionando CORS
+
+Permitindo outros endereços tenham acesso a nossa **API.**
+Por enquanto a gente só está conseguindo acessar nossa **API** pelo Navegador acessando pelo próprio endereço dela, ou pelo Insominia.
+Quando tivermos nossa aplicação em outro domínio, e eu queira acessar nossa aplicação que está em outro endereço, ele não vai permitir.
+Tudo isso por causa do CORS, Cross Access Origin Security basicamente ele previne o acesso de domínios que não são do mesmo domínio da nossa api, pra gente permitir esse acesso de outros domínios, teremos que instalar o cros.
+
+    npm install cors
+
+Após feita a instalação do **cors**
+
+    const  cors  =  require("cors"); // Importando o cors    
+    app.use(cors()); //Permite o uso do cors
+
+Parâmetros podemos passar os domínios que quisermos
+Peixando assim todos os dominios podem ser acessado publicamente. 
   
   
   
@@ -277,11 +406,9 @@ Isso aqui para registrar um modelo na nossa aplicação.
   
 
 ### Projeto Criado Junto ao Curso RocketSeat.
-
 [RocketSeat](https://app.rocketseat.com.br/starter/)
 
   
 
 ### Douglas Coelho.
-
 [GitHub Repositories](https://github.com/douglasruuan?tab=repositories)
