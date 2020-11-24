@@ -345,9 +345,7 @@ Quando estivermos trabalhando com muitos **models** ao mesmo tempo temos uma bib
 
     npm install require-dir
     
-	     /**
-	     *Dentro do prompt
-		 */
+	     
 
   
 
@@ -386,20 +384,20 @@ const mongoose = require('mongoose');
 	*/
 const ProductSchema = new mongoose.Schema({
 	title: {
-	type: String,
-	required: true,
+		type: String,
+		required: true,
 	},
 	description: {
-	type: String,
-	required: true,
+		type: String,
+		required: true,
 	},
 	url: {
-	type: String,
-	required: true,
+		type: String,
+		required: true,
 	},
 	createdAt: {
-	type: Date,
-	default: _Date_.now,
+		type: Date,
+		default: _Date_.now,
 	},
 });
 mongoose.model('Product', ProductSchema);
